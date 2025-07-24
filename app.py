@@ -1,12 +1,12 @@
+import json
+import os
+import logging
+
 from flask import Flask, redirect, render_template, request, jsonify, url_for
-from django.shortcuts import render
 from apscheduler.schedulers.background import BackgroundScheduler
 from classes.RommAPIHelper import RommAPIHelper
 from classes.DeckRommSyncDatabase import DeckRommSyncDatabase
 from classes.BackgroundWorker import BackgroundWorker
-import json
-import os
-import logging
 
 # Logging für den Background Worker
 background_logger = logging.getLogger("background_worker")
@@ -21,10 +21,10 @@ app = Flask(__name__)
 def run_background_task():
     """Ruft die `run()`-Methode der Hintergrundklasse auf."""
     # Background Worker erstellen
-    bgWorker = BackgroundWorker("deckrommsync.db", background_logger)    
+    bgWorker = BackgroundWorker("deckrommsync.db", background_logger)
     background_logger.info("Background Task started...")
     bgWorker.sync_rommCollections()
-    bgWorker.sync_copyRoms()    
+    bgWorker.sync_copyRoms()
     background_logger.info("Background Task finished...")
 
 
@@ -45,14 +45,14 @@ def load_json_config(file_path="config.json"):
     return {}
 
 @app.route('/')
-def status():  
-    system_logger.info("Status Page")  
+def status():
+    system_logger.info("Status Page")
     db = DeckRommSyncDatabase(app_config["database"].get("name", "deckrommsync.db"))
-    collection_db_result = db.select_as_dict("collections", ['*'], 'collection_sync = 1')    
+    collection_db_result = db.select_as_dict("collections", ['*'], 'collection_sync = 1')
     collections = []
     for collection in collection_db_result:
         roms_in_collection = db.select_as_dict("roms", ['*'], 'collections_id = ?', (collection["collections_id"],))
-        collection["roms"] = roms_in_collection    
+        collection["roms"] = roms_in_collection
         collections.append(collection)
 
     return render_template('status.html', status="Server läuft", version="1.0.0", collections=collections)
@@ -165,19 +165,19 @@ def log():
             log_content = logs[::-1]  # Neueste Gruppe zuerst
     except FileNotFoundError:
         return [["Log-Datei nicht gefunden!"]]
-    
+
     return render_template('log.html', log_groups=log_content)
 
-if __name__ == '__main__':    
+if __name__ == '__main__':
     system_logger.info("Flask-App started...")
     # Config
     global app_config
-    app_config = load_json_config()  
+    app_config = load_json_config()
 
     # DEBUG
     # Scheduler starten
     scheduler = BackgroundScheduler()
     scheduler.add_job(run_background_task, "interval", minutes=1)  # Alle 2 Minuten
-    scheduler.start()  
+    scheduler.start()
 
     app.run(debug=True, use_reloader=False, host=app_config["server"].get("host", "localhost"), port=app_config["server"].get("port", 5000))
