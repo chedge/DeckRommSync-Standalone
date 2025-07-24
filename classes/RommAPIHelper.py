@@ -11,7 +11,7 @@ class RommAPIHelper:
         url = self.api_base_url + '/token'
         
         auth_string = f"{username}:{password}"
-        self.auth_encoded = b64encode(auth_string.encode()).decode()              
+        self.auth_encoded = b64encode(auth_string.encode()).decode()
 
     # Heartbeat
     def getRommHeartbeat(self):
@@ -31,7 +31,7 @@ class RommAPIHelper:
         if response.status_code == 200:
             return response.json()
         else:
-            print("Fehler:", response.status_code, response.text)
+            print("getRommHeartbeat Error:", response.status_code, response.text)
     
     
     def getCollections(self):
@@ -53,7 +53,7 @@ class RommAPIHelper:
             # print(response.text)
             return response.json()
         else:
-            print("Fehler:", response.status_code, response.text) 
+            print("getCollections Error:", response.status_code, response.text) 
 
     def getCollectionByID(self, collectionID):
 
@@ -74,7 +74,7 @@ class RommAPIHelper:
             # print(response.text)
             return response.json()
         else:
-            print("Fehler:", response.status_code, response.text)  
+            print("error:", response.status_code, response.text)  
 
     
     def getPlatforms(self):
@@ -92,10 +92,10 @@ class RommAPIHelper:
         response = requests.get(url, headers=headers)
 
         if response.status_code == 200:
-            # print(response.text)
+#            print("platform response: " + response.text)
             return response.json()
         else:
-            print("Fehler:", response.status_code, response.text)
+            print("error:", response.status_code, response.text)
     
     def getRomByID(self, romID):
         # Prepare URL
@@ -115,7 +115,7 @@ class RommAPIHelper:
             # print(response.text)
             return response.json()
         else:
-            print("Fehler:", response.status_code, response.text)         
+            print("error:", response.status_code, response.text)         
 
     def downloadRom(self, romID, romFilename, download_path):
         # Prepare URL
